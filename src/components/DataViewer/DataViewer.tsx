@@ -37,8 +37,10 @@ export function DataViewer() {
   const handleFileSelect = (templateId: string) => {
     setSelectedTemplateId(templateId);
     setShowTemplateDialog(false);
-    // Trigger file input click
-    fileInputRef.current?.click();
+    // Small delay to ensure dialog is closed before triggering file input
+    setTimeout(() => {
+      fileInputRef.current?.click();
+    }, 100);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
