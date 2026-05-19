@@ -12,6 +12,7 @@ interface DataStore {
   columns: Column[];
   templateId: string | null;
   setData: (data: Record<string, any>[], columns: Column[]) => void;
+  setTemplateId: (id: string | null) => void;
 }
 
 export const useDataStore = create<DataStore>((set) => ({
@@ -19,4 +20,5 @@ export const useDataStore = create<DataStore>((set) => ({
   columns: [],
   templateId: null,
   setData: (data, columns) => set({ data, columns }),
+  setTemplateId: (id) => set({ templateId: id }),
 }));
