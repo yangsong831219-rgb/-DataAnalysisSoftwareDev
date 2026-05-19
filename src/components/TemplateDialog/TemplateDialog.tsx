@@ -45,11 +45,11 @@ const defaultTemplates: Template[] = [
 
 export function TemplateDialog({ open, onClose, onSelect }: Props) {
   const [templates, setTemplates] = useState<Template[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string>('donghua_type');
 
   useEffect(() => {
     if (open) {
-      // 首先尝试从 localStorage 加载
+      setSelected('donghua_type');
       const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (stored) {
         try {
@@ -58,22 +58,25 @@ export function TemplateDialog({ open, onClose, onSelect }: Props) {
           setTemplates(defaultTemplates);
         }
       } else {
-        // 保存默认模板到 localStorage
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(defaultTemplates));
         setTemplates(defaultTemplates);
       }
     }
   }, [open]);
 
+  const handleConfirm = () => {
+    if (selected) {
+      onSelect(selected);
+    }
+  };
+
   return (
-    <Modal title="选择数据文件模板" open={open} onCancel={onClose} onOk={() => selected && onSelect(selected)} okText="确认加载" cancelText="取消">
+    <Modal title="选择数据文件模板" open={open} onCancel={onClose} onOk={handleConfirm} okText="确认加载" cancelText="取消">
       <List
         dataSource={templates}
         renderItem={(t) => (
           <List.Item
-            onClick={() => {
-              setSelected(t.id);
-            }}
+            onClick={() => setSelected(t.id)}
             style={{ cursor: 'pointer', background: selected === t.id ? '#e6f7ff' : undefined }}
           >
             <List.Item.Meta title={t.name} description={t.file_format} />

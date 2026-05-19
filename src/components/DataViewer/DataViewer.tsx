@@ -37,6 +37,7 @@ export function DataViewer() {
   const handleFileSelect = (templateId: string) => {
     console.log('handleFileSelect called with:', templateId);
     setSelectedTemplateId(templateId);
+    setShowTemplateDialog(false);
     console.log('Triggering file input click in 100ms');
     setTimeout(() => {
       if (fileInputRef.current) {
