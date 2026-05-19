@@ -73,7 +73,6 @@ export function TemplateDialog({ open, onClose, onSelect }: Props) {
           <List.Item
             onClick={() => {
               setSelected(t.id);
-              onSelect(t.id);
             }}
             style={{ cursor: 'pointer', background: selected === t.id ? '#e6f7ff' : undefined }}
           >

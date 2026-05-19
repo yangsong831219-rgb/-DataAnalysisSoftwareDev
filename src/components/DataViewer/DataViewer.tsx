@@ -37,12 +37,14 @@ export function DataViewer() {
   const handleFileSelect = (templateId: string) => {
     console.log('handleFileSelect called with:', templateId);
     setSelectedTemplateId(templateId);
-    console.log('Triggering file input click');
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
-    } else {
-      console.log('fileInputRef.current is null');
-    }
+    console.log('Triggering file input click in 100ms');
+    setTimeout(() => {
+      if (fileInputRef.current) {
+        fileInputRef.current.click();
+      } else {
+        console.log('fileInputRef.current is null');
+      }
+    }, 100);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
