@@ -71,7 +71,10 @@ export function TemplateDialog({ open, onClose, onSelect }: Props) {
         dataSource={templates}
         renderItem={(t) => (
           <List.Item
-            onClick={() => setSelected(t.id)}
+            onClick={() => {
+              setSelected(t.id);
+              onSelect(t.id);
+            }}
             style={{ cursor: 'pointer', background: selected === t.id ? '#e6f7ff' : undefined }}
           >
             <List.Item.Meta title={t.name} description={t.file_format} />
