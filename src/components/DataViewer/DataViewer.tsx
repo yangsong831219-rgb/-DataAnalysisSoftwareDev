@@ -35,25 +35,90 @@ export function DataViewer() {
   };
 
   const handleFileSelect = (templateId: string) => {
-    console.log('handleFileSelect called with:', templateId);
+    console.log('=== handleFileSelect ===');
+    console.log('templateId:', templateId);
     setSelectedTemplateId(templateId);
+    console.log('selectedTemplateId after set:', templateId);
+    console.log('Closing dialog...');
     setShowTemplateDialog(false);
-    console.log('Triggering file input click in 100ms');
+    console.log('Dialog should be closed now');
+    console.log('Clicking file input in 200ms...');
     setTimeout(() => {
+      console.log('=== setTimeout callback ===');
+      console.log('fileInputRef.current:', fileInputRef.current);
       if (fileInputRef.current) {
+        console.log('Clicking file input');
         fileInputRef.current.click();
       } else {
-        console.log('fileInputRef.current is null');
+        console.log('ERROR: fileInputRef.current is null');
       }
-    }, 100);
+    }, 200);
+  };
+
+  const loadTestData = (type: 'donghua' | 'guangming') => {
+    let data: ParsedRow[] = [];
+    let storeColumns: { name: string; type: string; unit: string; comment: string }[] = [];
+
+    if (type === 'donghua') {
+      data = [
+        { '时间': 0, '应变1': 0.0, '应变2': 0.0, '位移': 0.000, '压力': 101325 },
+        { '时间': 0.1, '应变1': 5.2, '应变2': 3.8, '位移': 0.052, '压力': 101328 },
+        { '时间': 0.2, '应变1': 10.5, '应变2': 7.9, '位移': 0.105, '压力': 101330 },
+        { '时间': 0.3, '应变1': 15.9, '应变2': 12.1, '位移': 0.159, '压力': 101333 },
+        { '时间': 0.4, '应变1': 21.4, '应变2': 16.4, '位移': 0.214, '压力': 101335 },
+      ];
+      storeColumns = [
+        { name: '时间', type: 'time', unit: 's', comment: '时间' },
+        { name: '应变1', type: 'strain', unit: 'με', comment: '应变1(με)' },
+        { name: '应变2', type: 'strain', unit: 'με', comment: '应变2(με)' },
+        { name: '位移', type: 'displacement', unit: 'mm', comment: '位移(mm)' },
+        { name: '压力', type: 'numeric', unit: 'Pa', comment: '压力(Pa)' },
+      ];
+    } else {
+      data = [
+        { '时间': 0.0, '通道1波长': 1550.123, '通道2波长': 1550.456, '温度1': 25.1, '温度2': 25.3 },
+        { '时间': 0.5, '通道1波长': 1550.128, '通道2波长': 1550.461, '温度1': 25.2, '温度2': 25.4 },
+        { '时间': 1.0, '通道1波长': 1550.134, '通道2波长': 1550.467, '温度1': 25.3, '温度2': 25.5 },
+        { '时间': 1.5, '通道1波长': 1550.139, '通道2波长': 1550.472, '温度1': 25.4, '温度2': 25.6 },
+        { '时间': 2.0, '通道1波长': 1550.145, '通道2波长': 1550.478, '温度1': 25.5, '温度2': 25.7 },
+      ];
+      storeColumns = [
+        { name: '时间', type: 'time', unit: 's', comment: '时间(s)' },
+        { name: '通道1波长', type: 'wavelength', unit: 'nm', comment: '通道1波长(nm)' },
+        { name: '通道2波长', type: 'wavelength', unit: 'nm', comment: '通道2波长(nm)' },
+        { name: '温度1', type: 'temperature', unit: '°C', comment: '温度1(°C)' },
+        { name: '温度2', type: 'temperature', unit: '°C', comment: '温度2(°C)' },
+      ];
+    }
+
+    setData(data, storeColumns);
+    message.success(`成功加载 ${data.length} 条测试数据 (${type === 'donghua' ? '东华型' : '光明型'})`);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !selectedTemplateId) return;
+    if (!file) return;
+
+    // If no template selected, try to detect based on file extension
+    let templateId = selectedTemplateId;
+    if (!templateId) {
+      const fileName = file.name.toLowerCase();
+      if (fileName.endsWith('.csv')) {
+        templateId = 'guangming_type';
+      } else if (fileName.endsWith('.txt')) {
+        templateId = 'donghua_type';
+      } else if (fileName.endsWith('.xlsx') || fileName.endsWith('.xls')) {
+        templateId = 'donghua_type';
+      }
+    }
+
+    if (!templateId) {
+      message.error('请先选择模板');
+      return;
+    }
 
     const templates = getTemplates();
-    const template = templates.find(t => t.id === selectedTemplateId);
+    const template = templates.find(t => t.id === templateId);
     if (!template) {
       message.error('未找到对应模板');
       return;
@@ -134,12 +199,21 @@ export function DataViewer() {
         <Button type="primary" onClick={handleOpenFile}>
           📂 打开文件
         </Button>
+        <Button onClick={() => fileInputRef.current?.click()}>
+          选择文件
+        </Button>
+        <Button onClick={() => loadTestData('donghua')}>
+          加载测试数据(东华型)
+        </Button>
+        <Button onClick={() => loadTestData('guangming')}>
+          加载测试数据(光明型)
+        </Button>
       </Space>
 
       <input
         type="file"
         ref={fileInputRef}
-        style={{ display: 'none' }}
+        style={{ display: 'block', marginBottom: 16 }}
         accept=".txt,.csv,.xlsx,.xls"
         onChange={handleFileChange}
       />
